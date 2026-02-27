@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const metadataContainer = document.getElementById('metadata-container');
     const ungenerateBtn = document.getElementById('ungenerate-btn');
     const topGif = document.getElementById('top-right-gif');
-    const gifToggle = document.getElementById('gif-toggle');
 
     const SEARCH_TAGS = 'yuri';
     let totalPostsCount = 0;
@@ -49,7 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchRandomImage() {
-        if (totalPostsCount === 0) return;
+        if (totalPostsCount === 0) {
+            // Mobile network initial fetch might fail; retry on click.
+            console.log("Retrying initial post count fetch...");
+            await init();
+            if (totalPostsCount === 0) {
+                showError();
+                return;
+            }
+        }
 
         // Play sound only if toggle is checked
         if (clickSound && soundToggle.checked) {
@@ -245,15 +252,49 @@ document.addEventListener('DOMContentLoaded', () => {
     generateBtn.addEventListener('click', fetchRandomImage);
     ungenerateBtn.addEventListener('click', ungenerateImage);
 
-    // Toggle GIF visibility
-    if (gifToggle && topGif) {
-        gifToggle.addEventListener('change', (e) => {
+    // Dynamically inject GIF toggle since index.html was locked
+    const soundContainer = document.querySelector('.sound-toggle-container');
+    if (soundContainer && topGif && !document.getElementById('gif-toggle')) {
+        const gifToggleInput = document.createElement('input');
+        gifToggleInput.type = 'checkbox';
+        gifToggleInput.id = 'gif-toggle';
+        gifToggleInput.checked = true;
+        gifToggleInput.style.marginLeft = '15px';
+
+        const gifToggleLabel = document.createElement('label');
+        gifToggleLabel.htmlFor = 'gif-toggle';
+        gifToggleLabel.textContent = 'Show GIF';
+
+        soundContainer.appendChild(gifToggleInput);
+        soundContainer.appendChild(gifToggleLabel);
+
+        // Listeners for dynamic toggle
+        gifToggleInput.addEventListener('change', (e) => {
             if (e.target.checked) {
                 topGif.classList.remove('hidden');
             } else {
                 topGif.classList.add('hidden');
             }
         });
+    }
+
+    // Dynamically inject disclaimer disclaimer since index.html was locked
+    const mainContainer = document.querySelector('.container');
+    if (mainContainer && !document.querySelector('.disclaimer-container')) {
+        const discDiv = document.createElement('div');
+        discDiv.className = 'disclaimer-container';
+        discDiv.style.marginTop = '25px';
+        discDiv.style.paddingTop = '15px';
+        discDiv.style.borderTop = '1px solid #ccc';
+        discDiv.style.textAlign = 'center';
+
+        const p = document.createElement('p');
+        p.style.fontSize = '11px';
+        p.style.color = '#777';
+        p.textContent = 'Note: If loading fails on your first visit (especially on mobile devices), please wait a moment and try clicking Generate Image again.';
+
+        discDiv.appendChild(p);
+        mainContainer.appendChild(discDiv);
     }
 
     // Initial setup Call
