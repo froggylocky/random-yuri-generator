@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     async function init() {
         setLoadingState(true);
         try {
-            // First API call just to get the count (using corsproxy to bypass CORS on localhost)
+            // First API call just to get the count (using allorigins to bypass CORS)
             const targetUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=${SEARCH_TAGS}&limit=1`;
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
             const response = await fetch(proxyUrl);
             const xmlText = await response.text();
 
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const randomPid = Math.floor(Math.random() * totalPostsCount);
 
             const apiUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=1&pid=${randomPid}`;
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
 
             const response = await fetch(proxyUrl);
 
