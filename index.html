@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Yuri Generator</title>
+    <meta name="description" content="A random yuri image generator using the Safebooru API.">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3F1dzJ0ejVpOW82dml1ZGgwcWNkd21ua2hubjUyMzJuajRteGY1MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9ARsrP5GvsFZKArult/giphy.gif"
+        id="top-right-gif" alt="Anime GIF">
+    <div class="container">
+        <header>
+            <h1>Random Yuri Generator</h1>
+            <p>All art from Safebooru!</p>
+        </header>
+
+        <section class="content-section">
+            <div id="image-container" class="image-container">
+                <div id="loading-spinner" class="spinner hidden">Loading image...</div>
+                <div id="error-message" class="error-message hidden">
+                    <p>Failed to fetch image. Please try again.</p>
+                </div>
+                <img id="result-image" src="" alt="Random Yuri Image" class="hidden">
+            </div>
+
+            <div class="controls">
+                <button id="generate-btn">
+                    <span class="btn-text">Generate Image</span>
+                </button>
+                <button id="ungenerate-btn" class="hidden">
+                    <span class="btn-text">Ungenerate Image</span>
+                </button>
+                <div class="sound-toggle-container">
+                    <input type="checkbox" id="sound-toggle" checked>
+                    <label for="sound-toggle">Play Button Sound</label>
+                </div>
+
+                <div class="image-info hidden" id="image-info">
+                    <a id="source-link" href="#" target="_blank" rel="noopener noreferrer">View Post</a>
+                    <div id="tags-container" class="tags-container"></div>
+                    <div id="metadata-container" class="metadata-container"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Audio element for button sound -->
+    <audio id="click-sound" src="https://files.catbox.moe/ab6ee8.ogg" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
