@@ -23,9 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // First API call just to get the count
             // Safebooru does not natively support CORS headers for browser fetch,
             // so we must route the request through a proxy like allorigins.
-            const targetUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=${SEARCH_TAGS}&limit=1`;
-            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
-            const response = await fetch(proxyUrl);
+            // Use Vercel rewrite to bypass CORS entirely
+            const targetUrl = `/api/safebooru/index.php?page=dapi&s=post&q=index&tags=${SEARCH_TAGS}&limit=1`;
+            const response = await fetch(targetUrl);
             const xmlText = await response.text();
 
             // Check if we hit an API limit on the very first call
@@ -94,11 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const maxPage = Math.ceil(totalPostsCount / postsPerPage) - 1;
             const randomPage = Math.floor(Math.random() * maxPage);
 
-            const apiUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=${postsPerPage}&pid=${randomPage}`;
-            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`;
+            const apiUrl = `/api/safebooru/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=${postsPerPage}&pid=${randomPage}`;
 
-            // Fetch via proxy to avoid CORS blocks
-            const response = await fetch(proxyUrl);
+            // Fetch via Vercel proxy rewrite to avoid CORS blocks
+            const response = await fetch(apiUrl);
 
             // Handle if the response body says it's limited even if it's a 200 OK
             const responseText = await response.text();
