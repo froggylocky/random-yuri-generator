@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoadingState(true);
         hideError();
         try {
-            // First API call just to get the count (using allorigins to bypass CORS)
+            // First API call just to get the count
+            // Safebooru natively supports CORS, so we can fetch directly
             const targetUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=${SEARCH_TAGS}&limit=1`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
-            const response = await fetch(proxyUrl);
+            const response = await fetch(targetUrl);
             const xmlText = await response.text();
 
             // Parse XML to get count attribute
@@ -80,25 +80,23 @@ document.addEventListener('DOMContentLoaded', () => {
         resultImage.classList.add('hidden');
         resultImage.style.position = 'absolute'; // Keep it out of flow while loading
 
+        ungenerateBtn.classList.add('hidden');
+        ungenerateBtn.disabled = true;
+
         try {
             // Pick a random page offset (pid)
             // Safebooru pid is 0-indexed. 
             // The max limit depends, but limit=1 means pid=0 is 1st image, pid=1 is 2nd, etc.
-            // Safebooru restricts API requests that go too deep (usually offset > ~200,000 or pid > ??)
-            // Usually, randomizing pid up to total count works fine if limit=1
-            // Let's constrain it slightly just in case the API has a hard limit on pid, but 100k+ usually works.
-
-            // Note: Safebooru json api format:
-            // https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=yuri&limit=1&pid=RandomNumber
-
-            // A safer approach for totally random on Gelbooru-like systems if pid is clamped:
-            // Safebooru seems mostly fine with large pids.
-            const randomPid = Math.floor(Math.random() * totalPostsCount);
+            // Safebooru restricts API requests that go too deep.
+            // Based on testing, pids > 100,000 can start failing or returning API limits.
+            // We clamp the maximum limit to ensure reliability.
+            const maxSafeCount = Math.min(totalPostsCount, 100000);
+            const randomPid = Math.floor(Math.random() * maxSafeCount);
 
             const apiUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=1&pid=${randomPid}`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
 
-            const response = await fetch(proxyUrl);
+            // Fetch natively without proxy for faster, more reliable loading
+            const response = await fetch(apiUrl);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -189,8 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     sizeEl.innerHTML = `<strong>Size:</strong> ${w}x${h}`;
                     metadataContainer.appendChild(sizeEl);
 
-                    // Show ungenerate button
+                    // Show and enable ungenerate button
                     ungenerateBtn.classList.remove('hidden');
+                    ungenerateBtn.disabled = false;
 
                     setLoadingState(false);
                 };
@@ -222,12 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
             spinner.classList.remove('hidden');
             generateBtn.disabled = true;
             generateBtn.querySelector('.btn-text').textContent = 'Loading...';
-            ungenerateBtn.disabled = true;
         } else {
             spinner.classList.add('hidden');
             generateBtn.disabled = false;
             generateBtn.querySelector('.btn-text').textContent = 'Generate Image';
-            ungenerateBtn.disabled = false;
         }
     }
 
@@ -240,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tagsContainer.innerHTML = '';
         metadataContainer.innerHTML = '';
         ungenerateBtn.classList.add('hidden');
+        ungenerateBtn.disabled = true;
     }
 
     function showError() {
@@ -249,6 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resultImage.style.position = 'absolute';
         imageInfo.classList.add('hidden');
         imageInfo.style.position = 'absolute';
+        ungenerateBtn.classList.add('hidden');
+        ungenerateBtn.disabled = true;
     }
 
     function hideError() {
