@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Safebooru does not natively support CORS headers for browser fetch,
             // so we must route the request through a proxy like allorigins.
             const targetUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=${SEARCH_TAGS}&limit=1`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
             const response = await fetch(proxyUrl);
             const xmlText = await response.text();
 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const randomPage = Math.floor(Math.random() * maxPage);
 
             const apiUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=${postsPerPage}&pid=${randomPage}`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+            const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`;
 
             // Fetch via proxy to avoid CORS blocks
             const response = await fetch(proxyUrl);
