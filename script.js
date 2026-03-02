@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize by getting the total count of yuri posts
     async function init() {
         setLoadingState(true);
+        hideError();
         try {
             // First API call just to get the count (using allorigins to bypass CORS)
             const targetUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=${SEARCH_TAGS}&limit=1`;
@@ -49,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchRandomImage(eventOrRetryCount) {
         let retryCount = typeof eventOrRetryCount === 'number' ? eventOrRetryCount : 0;
+
+        hideError();
 
         if (totalPostsCount === 0) {
             // Mobile network initial fetch might fail; retry on click.
