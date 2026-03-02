@@ -21,9 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
         hideError();
         try {
             // First API call just to get the count
-            // Safebooru natively supports CORS, so we can fetch directly
+            // Safebooru does not natively support CORS headers for browser fetch,
+            // so we must route the request through a proxy like allorigins.
             const targetUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=${SEARCH_TAGS}&limit=1`;
-            const response = await fetch(targetUrl);
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+            const response = await fetch(proxyUrl);
             const xmlText = await response.text();
 
             // Check if we hit an API limit on the very first call
@@ -93,9 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const randomPage = Math.floor(Math.random() * maxPage);
 
             const apiUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=${postsPerPage}&pid=${randomPage}`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
 
-            // Fetch natively without proxy for faster, more reliable loading
-            const response = await fetch(apiUrl);
+            // Fetch via proxy to avoid CORS blocks
+            const response = await fetch(proxyUrl);
 
             // Handle if the response body says it's limited even if it's a 200 OK
             const responseText = await response.text();
