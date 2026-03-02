@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(targetUrl);
             const xmlText = await response.text();
 
+            // Check if we hit an API limit on the very first call
+            if (xmlText.includes('API limited due to abuse') || xmlText.includes('Search error:')) {
+                throw new Error("API_LIMITED");
+            }
+
             // Parse XML to get count attribute
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
@@ -34,9 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (postsElement) {
                 totalPostsCount = parseInt(postsElement.getAttribute("count"), 10);
                 console.log(`Initial Setup: Found ${totalPostsCount} posts for tag '${SEARCH_TAGS}'`);
-
-                // Auto-loading removed
-                // await fetchRandomImage();
             } else {
                 throw new Error("Could not parse post count from XML.");
             }
@@ -54,12 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         hideError();
 
         if (totalPostsCount === 0) {
-            // Mobile network initial fetch might fail; retry on click.
             console.log("Retrying initial post count fetch...");
             await init();
             if (totalPostsCount === 0) {
-                showError();
-                return;
+                return; // Error is already handled by init()
             }
         }
 
@@ -84,28 +84,35 @@ document.addEventListener('DOMContentLoaded', () => {
         ungenerateBtn.disabled = true;
 
         try {
-            // Pick a random page offset (pid)
-            // Safebooru pid is 0-indexed. 
-            // The max limit depends, but limit=1 means pid=0 is 1st image, pid=1 is 2nd, etc.
-            // Safebooru restricts API requests that go too deep.
-            // Based on testing, pids > 100,000 can start failing or returning API limits.
-            // We clamp the maximum limit to ensure reliability.
-            const maxSafeCount = Math.min(totalPostsCount, 100000);
-            const randomPid = Math.floor(Math.random() * maxSafeCount);
+            // To fetch ANY random post without hitting Safebooru's pid (page offset) limit,
+            // we calculate a random page (pid) where we request 100 posts per page.
+            // Safebooru limit is usually ~2000 pages when requesting 100 items per page (200k posts)
+            // But since total yuri posts is ~100k, the max page is ~1000, which is perfectly safe!
+            const postsPerPage = 100;
+            const maxPage = Math.ceil(totalPostsCount / postsPerPage) - 1;
+            const randomPage = Math.floor(Math.random() * maxPage);
 
-            const apiUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=1&pid=${randomPid}`;
+            const apiUrl = `https://safebooru.org/index.php?page=dapi&s=post&q=index&json=1&tags=${SEARCH_TAGS}&limit=${postsPerPage}&pid=${randomPage}`;
 
             // Fetch natively without proxy for faster, more reliable loading
             const response = await fetch(apiUrl);
+
+            // Handle if the response body says it's limited even if it's a 200 OK
+            const responseText = await response.text();
+            if (responseText.includes('API limited due to abuse')) {
+                throw new Error("API_LIMITED");
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
+            const data = JSON.parse(responseText);
 
             if (data && data.length > 0) {
-                const post = data[0];
+                // Pick a random post from the 100 returned on this random page
+                const randomArrayIndex = Math.floor(Math.random() * data.length);
+                const post = data[randomArrayIndex];
 
                 // Choose the best URL. Safebooru usually provides sample_url or file_url within the JSON.
                 // JSON structure: directory, image, id, etc.
@@ -211,7 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Error fetching random image:", error);
-            showError();
+            if (error.message === "API_LIMITED") {
+                showError("The image board API is currently experiencing extreme load or rate limiting. Please wait a few minutes and try again.");
+                // Prevent quick retries if we are explicitly API limited
+            } else {
+                showError("Failed to fetch image. Please try again.");
+            }
             setLoadingState(false);
         }
     }
@@ -240,7 +252,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ungenerateBtn.disabled = true;
     }
 
-    function showError() {
+    function showError(customMessage) {
+        if (customMessage) {
+            errorMessage.innerHTML = `<p>${customMessage}</p>`;
+        } else {
+            errorMessage.innerHTML = `<p>Failed to fetch image. Please try again.</p>`;
+        }
         errorMessage.classList.remove('hidden');
         errorMessage.style.position = 'relative';
         resultImage.classList.add('hidden');
