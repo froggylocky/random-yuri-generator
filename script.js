@@ -47,7 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function fetchRandomImage() {
+    async function fetchRandomImage(eventOrRetryCount) {
+        let retryCount = typeof eventOrRetryCount === 'number' ? eventOrRetryCount : 0;
+
         if (totalPostsCount === 0) {
             // Mobile network initial fetch might fail; retry on click.
             console.log("Retrying initial post count fetch...");
@@ -112,26 +114,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let imageUrl = '';
 
-                if (post.sample_url) {
-                    // Sometimes modern safebooru api provides this directly in json now? Usually it doesn't.
-                    imageUrl = post.sample_url;
+                // Prefer sample_url for significantly faster loading times.
+                // Fallback to file_url or constructed URL.
+                if (post.sample_url && post.sample_url !== '') {
+                    // Safebooru sometimes uses relative // URLs
+                    imageUrl = post.sample_url.startsWith('//') ? 'https:' + post.sample_url : post.sample_url;
+                } else if (post.file_url && post.file_url !== '') {
+                    imageUrl = post.file_url.startsWith('//') ? 'https:' + post.file_url : post.file_url;
                 } else if (post.directory && post.image) {
-                    // Manually construct
-                    // Check if we should use sample (usually if width > 850ish)
-                    if (post.sample === 1 || post.sample === "true") {
-                        // Note: safebooru file extension might change for sample, but usually it's jpg
-                        // Let's just use the main file_url equivalent for simplicity and quality, 
-                        // since we have a fast connection usually.
-                        imageUrl = `https://safebooru.org/images/${post.directory}/${post.image}`;
+                    if (post.sample) {
+                        // Constructed sample URL, usually `.jpg` instead of original extension.
+                        const baseName = post.image.split('.')[0];
+                        imageUrl = `https://safebooru.org/samples/${post.directory}/sample_${baseName}.jpg`;
                     } else {
                         imageUrl = `https://safebooru.org/images/${post.directory}/${post.image}`;
                     }
-                } else if (post.file_url) {
-                    imageUrl = post.file_url;
-                }
-
-                if (!imageUrl) {
-                    // Fallback based on typical JSON response structure if above fails
+                } else {
                     imageUrl = `https://safebooru.org/images/${post.directory}/${post.image}`;
                 }
 
@@ -194,7 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     setLoadingState(false);
                 };
                 img.onerror = () => {
-                    throw new Error("Failed to load image from URL");
+                    console.warn("Failed to load image from URL:", imageUrl);
+                    if (retryCount < 3) {
+                        console.log(`Retrying fetchRandomImage (Attempt ${retryCount + 1})...`);
+                        fetchRandomImage(retryCount + 1);
+                    } else {
+                        showError();
+                        setLoadingState(false);
+                    }
                 };
                 img.src = imageUrl;
 
