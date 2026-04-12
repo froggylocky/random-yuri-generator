@@ -6,6 +6,23 @@
     --border-color: #ccc;
     --header-bg: #eef2f5;
     --font-stack: Tahoma, "Arial Unicode MS", "Open Sans", Helvetica, Arial, sans-serif;
+    --btn-bg: #f0f0f0;
+    --btn-hover: #e0e0e0;
+    --btn-border: #777;
+    --tag-bg: #f9f9f9;
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1a;
+    --text-primary: #e0e0e0;
+    --link-color: #6ea8fe;
+    --box-bg: #2d2d2d;
+    --border-color: #555;
+    --header-bg: #1a1a1a;
+    --btn-bg: #444;
+    --btn-hover: #555;
+    --btn-border: #666;
+    --tag-bg: #222;
 }
 
 * {
@@ -122,14 +139,15 @@ button {
 
 button {
     cursor: pointer;
-    background-color: #f0f0f0;
-    border: 1px solid #777;
+    background-color: var(--btn-bg);
+    border: 1px solid var(--btn-border);
     padding: 5px 15px;
     border-radius: 3px;
+    color: var(--text-primary);
 }
 
 button:hover {
-    background-color: #e0e0e0;
+    background-color: var(--btn-hover);
 }
 
 .sound-toggle-container {
@@ -155,7 +173,7 @@ button:hover {
     margin-top: 10px;
     padding: 10px;
     border: 1px solid var(--border-color);
-    background-color: #f9f9f9;
+    background-color: var(--tag-bg);
     text-align: left;
     max-width: 600px;
     margin-left: auto;

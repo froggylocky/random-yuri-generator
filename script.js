@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const metadataContainer = document.getElementById('metadata-container');
     const ungenerateBtn = document.getElementById('ungenerate-btn');
     const topGif = document.getElementById('top-right-gif');
+    const themeToggle = document.getElementById('theme-toggle');
 
     const SEARCH_TAGS = 'yuri';
     let totalPostsCount = 0;
@@ -162,7 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (tag) {
                                 const tagSpan = document.createElement('span');
                                 tagSpan.className = 'tag';
-                                tagSpan.textContent = tag.replace(/_/g, ' '); // Make readable
+                                const decodedTag = tag.replace(/_/g, ' ').replace(/&#039;/g, "'").replace(/&amp;/g, "&"); // Make readable & decode entities
+                                tagSpan.textContent = decodedTag;
                                 tagsContainer.appendChild(tagSpan);
                             }
                         });
@@ -285,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const gifToggleInput = document.createElement('input');
         gifToggleInput.type = 'checkbox';
         gifToggleInput.id = 'gif-toggle';
-        gifToggleInput.checked = true;
+        gifToggleInput.checked = false;
         gifToggleInput.style.marginLeft = '15px';
 
         const gifToggleLabel = document.createElement('label');
@@ -322,6 +324,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         discDiv.appendChild(p);
         mainContainer.appendChild(discDiv);
+    }
+
+    // Dark mode logic
+    if (themeToggle) {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        });
     }
 
     // Initial setup Call

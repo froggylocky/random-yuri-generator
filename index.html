@@ -12,7 +12,11 @@
 
 <body>
     <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3F1dzJ0ejVpOW82dml1ZGgwcWNkd21ua2hubjUyMzJuajRteGY1MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9ARsrP5GvsFZKArult/giphy.gif"
-        id="top-right-gif" alt="Anime GIF">
+        id="top-right-gif" class="hidden" alt="Anime GIF">
+    <div class="theme-toggle-container" style="position: absolute; top: 10px; left: 10px; z-index: 1000; font-size: 13px;">
+        <input type="checkbox" id="theme-toggle">
+        <label for="theme-toggle" style="cursor: pointer;">Dark Mode</label>
+    </div>
     <div class="container">
         <header>
             <h1>Random Yuri Generator</h1>
@@ -21,7 +25,7 @@
 
         <section class="content-section">
             <div id="image-container" class="image-container">
-                <div id="loading-spinner" class="spinner hidden">Loading image...</div>
+                <div id="loading-spinner" class="spinner hidden">Loading...</div>
                 <div id="error-message" class="error-message hidden">
                     <p>Failed to fetch image. Please try again.</p>
                 </div>
@@ -36,8 +40,8 @@
                     <span class="btn-text">Ungenerate Image</span>
                 </button>
                 <div class="sound-toggle-container">
-                    <input type="checkbox" id="sound-toggle" checked>
-                    <label for="sound-toggle">Play Button Sound</label>
+                    <input type="checkbox" id="sound-toggle">
+                    <label for="sound-toggle" style="cursor: pointer;">Play Button Sound</label>
                 </div>
 
                 <div class="image-info hidden" id="image-info">
