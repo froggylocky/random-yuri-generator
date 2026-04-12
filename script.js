@@ -281,23 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
     generateBtn.addEventListener('click', fetchRandomImage);
     ungenerateBtn.addEventListener('click', ungenerateImage);
 
-    // Dynamically inject GIF toggle since index.html was locked
-    const soundContainer = document.querySelector('.sound-toggle-container');
-    if (soundContainer && topGif && !document.getElementById('gif-toggle')) {
-        const gifToggleInput = document.createElement('input');
-        gifToggleInput.type = 'checkbox';
-        gifToggleInput.id = 'gif-toggle';
-        gifToggleInput.checked = false;
-        gifToggleInput.style.marginLeft = '15px';
-
-        const gifToggleLabel = document.createElement('label');
-        gifToggleLabel.htmlFor = 'gif-toggle';
-        gifToggleLabel.textContent = 'Show GIF';
-
-        soundContainer.appendChild(gifToggleInput);
-        soundContainer.appendChild(gifToggleLabel);
-
-        // Listeners for dynamic toggle
+    // Listeners for GIF toggle
+    const gifToggleInput = document.getElementById('gif-toggle');
+    if (gifToggleInput && topGif) {
         gifToggleInput.addEventListener('change', (e) => {
             if (e.target.checked) {
                 topGif.classList.remove('hidden');

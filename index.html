@@ -13,9 +13,19 @@
 <body>
     <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3F1dzJ0ejVpOW82dml1ZGgwcWNkd21ua2hubjUyMzJuajRteGY1MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9ARsrP5GvsFZKArult/giphy.gif"
         id="top-right-gif" class="hidden" alt="Anime GIF">
-    <div class="theme-toggle-container" style="position: absolute; top: 10px; left: 10px; z-index: 1000; font-size: 13px;">
-        <input type="checkbox" id="theme-toggle">
-        <label for="theme-toggle" style="cursor: pointer;">Dark Mode</label>
+    <div class="settings-container" style="position: absolute; top: 10px; left: 10px; z-index: 1000; font-size: 13px; display: flex; flex-direction: column; gap: 5px;">
+        <div>
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle" style="cursor: pointer;">Dark Mode</label>
+        </div>
+        <div>
+            <input type="checkbox" id="sound-toggle">
+            <label for="sound-toggle" style="cursor: pointer;">Play Button Sound</label>
+        </div>
+        <div>
+            <input type="checkbox" id="gif-toggle">
+            <label for="gif-toggle" style="cursor: pointer;">Show GIF</label>
+        </div>
     </div>
     <div class="container">
         <header>
@@ -39,10 +49,6 @@
                 <button id="ungenerate-btn" class="hidden">
                     <span class="btn-text">Ungenerate Image</span>
                 </button>
-                <div class="sound-toggle-container">
-                    <input type="checkbox" id="sound-toggle">
-                    <label for="sound-toggle" style="cursor: pointer;">Play Button Sound</label>
-                </div>
 
                 <div class="image-info hidden" id="image-info">
                     <a id="source-link" href="#" target="_blank" rel="noopener noreferrer">View Post</a>
