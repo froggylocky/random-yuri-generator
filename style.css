@@ -187,3 +187,25 @@ button:hover {
     margin-bottom: 5px;
     font-size: 12px;
 }
+
+/* Settings Controls Responsive */
+.settings-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .settings-container {
+        position: static;
+        margin-top: 15px;
+        align-items: center;
+        text-align: left;
+    }
+}
